@@ -98,11 +98,16 @@ def pytest_generate_tests(metafunc):
     metafunc.parametrize('test_name', files)
 
 
+@patch('caom2pipe.client_composable.ClientCollection')
 @patch('caom2utils.data_util.get_local_headers_from_fits')
 @patch('dao2caom2.metadata.DefiningMetadataFinder.check_local')
 @patch('caom2utils.data_util.StorageClientWrapper')
 def test_main_app(
-    data_client_mock, local_headers_mock, util_headers_mock, test_name
+    data_client_mock,
+    local_headers_mock,
+    util_headers_mock,
+    client_mock,
+    test_name,
 ):
     warnings.simplefilter('ignore', category=AstropyUserWarning)
     local_headers_mock.side_effect = _local_headers

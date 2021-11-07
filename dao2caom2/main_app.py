@@ -96,9 +96,10 @@ from caom2utils import ObsBlueprint, get_gen_proc_arg_parser
 from caom2utils import gen_proc_returns_obs
 from caom2pipe import astro_composable as ac
 from caom2pipe import caom_composable as cc
+from caom2pipe import client_composable as clc
 from caom2pipe import manage_composable as mc
 from dao2caom2 import dao_name as dn
-from dao2caom2 import telescopes
+from dao2caom2 import telescopes, metadata
 
 
 __all__ = ['dao_main_app', 'APPLICATION', 'to_caom2', 'update']
@@ -649,9 +650,20 @@ def _build_blueprints(uris):
     module = importlib.import_module(__name__)
     blueprints = {}
     headers_collection = {}
-    defining_metadata_finder = None
+    config = mc.Config()
+    config.get_executors()
+    clients = clc.ClientCollection(config)
+    defining_metadata_finder = metadata.DefiningMetadataFinder(
+        clients, config
+    )
     for uri in uris:
-        defining_metadata = defining_metadata_finder.get(uri)
+        dao_name = dn.DAOName(uri)
+        if dao_name.file_name.startswith('a'):
+            defining_metadata = metadata.DefiningMetadata(
+                DataProductType.IMAGE, uri, []
+            )
+        else:
+            defining_metadata = defining_metadata_finder.get(uri)
         telescopes.factory(defining_metadata)
         blueprint = ObsBlueprint(module=module)
         accumulate_bp(blueprint, uri)

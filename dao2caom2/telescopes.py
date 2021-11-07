@@ -644,15 +644,15 @@ current = {}
 defining_metadata_finder = None
 
 
-def factory(uri):
+def factory(defining_metadata):
     # at this point, decompose the classes based on what can be determined
     # from the file name only
-    ignore_scheme, ignore_path, f_name = mc.decompose_uri(uri)
+    ignore_scheme, ignore_path, f_name = mc.decompose_uri(
+        defining_metadata.uri
+    )
     if f_name.startswith('a'):
         result = SkyCam()
-        defining_metadata = DefiningMetadata(DataProductType.IMAGE, uri, [])
     else:
-        defining_metadata = defining_metadata_finder.get(uri)
         f_id = DAOName.remove_extensions(f_name)
         if defining_metadata.data_product_type == DataProductType.IMAGE:
             if (
@@ -697,9 +697,9 @@ def factory(uri):
             else:
                 result = Dao18MetreSpectrum()
 
-    result.uri = uri
+    result.uri = defining_metadata.uri
     global current
-    current[uri] = result
+    current[defining_metadata.uri] = result
     return defining_metadata.headers
 
 
