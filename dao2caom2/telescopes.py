@@ -75,6 +75,7 @@ from caom2 import ObservationIntentType
 from caom2pipe import astro_composable as ac
 from caom2pipe import manage_composable as mc
 from dao2caom2.dao_name import  DAOName
+from dao2caom2.metadata import DefiningMetadata
 
 
 __all__ = ['factory', 'get_current']
@@ -649,6 +650,7 @@ def factory(uri):
     ignore_scheme, ignore_path, f_name = mc.decompose_uri(uri)
     if f_name.startswith('a'):
         result = SkyCam()
+        defining_metadata = DefiningMetadata(DataProductType.IMAGE, uri, [])
     else:
         defining_metadata = defining_metadata_finder.get(uri)
         f_id = DAOName.remove_extensions(f_name)
@@ -698,6 +700,7 @@ def factory(uri):
     result.uri = uri
     global current
     current[uri] = result
+    return defining_metadata.headers
 
 
 def get_current(uri):

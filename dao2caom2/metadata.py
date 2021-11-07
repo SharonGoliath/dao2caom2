@@ -89,6 +89,7 @@ class DefiningMetadata:
     """
     data_product_type: DataProductType
     uri: str
+    headers: []
 
 
 class DefiningMetadataFinder:
@@ -122,7 +123,9 @@ class DefiningMetadataFinder:
         table = clc.query_tap_client(query_string, self._clients.query_client)
         result = None
         if len(table) == 1:
-            result = DefiningMetadata(table[0]['dataProductType'], uri)
+            result = DefiningMetadata(
+                table[0]['dataProductType'], uri, []
+            )
         self._logger.debug('End check_caom2')
         return result
 
@@ -136,7 +139,7 @@ class DefiningMetadataFinder:
                 self._logger.debug(f'Looking in {fqn} for headers.')
                 headers = data_util.get_local_headers_from_fits(fqn)
                 result = DefiningMetadata(
-                    self._get_data_product_type(headers), uri
+                    self._get_data_product_type(headers), uri, headers
                 )
                 break
         self._logger.debug('End check_local')
@@ -147,7 +150,7 @@ class DefiningMetadataFinder:
         headers = self._clients.data_client.get_head(uri)
         data_product_type = self._get_data_product_type(headers)
         self._logger.debug('End check_remote')
-        return DefiningMetadata(data_product_type, uri)
+        return DefiningMetadata(data_product_type, uri, headers)
 
     def get(self, uri):
         """

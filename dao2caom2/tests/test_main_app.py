@@ -155,4 +155,4 @@ def _local_headers(uri):
     dpt = (
         DataProductType.SPECTRUM if '-slit' in temp else DataProductType.IMAGE
     )
-    return metadata.DefiningMetadata(dpt, uri)
+    return metadata.DefiningMetadata(dpt, uri, headers)
